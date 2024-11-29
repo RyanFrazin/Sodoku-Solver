@@ -6,6 +6,7 @@ using namespace std;
 const int ROW = 9;
 const int COL = 9;
 const int STARTINGPOINT = 0;
+const int COORDINATE_DIGITS = 2;
 
 void fillCrossHatchArrWithZeroes(int crossHatchArr[ROW][COL]);
 void crossHatchBasedOnNum(int row, int col, int crossHatchArr[ROW][COL]);
@@ -21,13 +22,16 @@ bool searchMidRightCell(int crossHatchArray[ROW][COL]);
 bool searchBottomLeftCell(int crossHatchArray[ROW][COL]);
 bool searchBottomMidCell(int crossHatchArray[ROW][COL]);
 bool searchBottomRightCell(int crossHatchArray[ROW][COL]);
-void searchForCoordinatesOfIsolate(int crossHatchArray[ROW][COL], int startingRow, int startingCol, int lastRow, int lastCol);
+void searchForCoordinatesOfIsolate(int crossHatchArray[ROW][COL], int startingRow, int startingCol, int lastRow, int lastCol, int coordinates[COORDINATE_DIGITS]);
+void fillPuzzleArr(int crossHatchArr[ROW][COL], int puzzleArray[ROW][COL], int userNum);
 
 int main() {
 	//declarations
+	char userInput = 'y';
 	int userNum;
+	//int coordinates[2];
 
-	/*int puzzleArr[ROW][COL] = {
+	int puzzleArr[ROW][COL] = {
 		{5, 3, 4, 0, 7, 0, 9, 1, 2},
 		{6, 0, 0, 1, 9, 5, 0, 0, 0},
 		{0, 9, 8, 0, 0, 0, 0, 6, 0},
@@ -37,19 +41,19 @@ int main() {
 		{0, 6, 0, 0, 0, 0, 2, 8, 4},
 		{2, 8, 7, 4, 1, 9, 0, 0, 5},
 		{3, 4, 5, 0, 8, 0, 0, 7, 9}
-	};*/
-
-	int puzzleArr[ROW][COL] = {
-	{3, 0, 0, 2, 4, 0, 0, 6, 0},
-	{0, 4, 0, 0, 0, 0, 0, 5, 3},
-	{1, 8, 9, 6, 3, 5, 4, 0, 0},
-	{0, 0, 0, 0, 8, 0, 2, 0, 0},
-	{0, 0, 7, 4, 9, 6, 8, 0, 1},
-	{8, 9, 3, 1, 5, 0, 6, 0, 4},
-	{0, 0, 1, 9, 2, 0, 5, 0, 0},
-	{2, 0, 0, 3, 0, 0, 7, 4, 0},
-	{9, 6, 0, 5, 0, 0, 3, 0, 2}
 	};
+
+	/*int puzzleArr[ROW][COL] = {
+		{3, 0, 0, 2, 4, 0, 0, 6, 0},
+		{0, 4, 0, 0, 0, 0, 0, 5, 3},
+		{1, 8, 9, 6, 3, 5, 4, 0, 0},
+		{0, 0, 0, 0, 8, 0, 2, 0, 0},
+		{0, 0, 7, 4, 9, 6, 8, 0, 1},
+		{8, 9, 3, 1, 5, 0, 6, 0, 4},
+		{0, 0, 1, 9, 2, 0, 5, 0, 0},
+		{2, 0, 0, 3, 0, 0, 7, 4, 0},
+		{9, 6, 0, 5, 0, 0, 3, 0, 2}
+	};*/
 
 	int crossHatchArr[ROW][COL] = {
 		{0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -64,38 +68,55 @@ int main() {
 	};
 
 
-	//get user input
-	cout << "What puzzle number do you want to cross hatch: ";
-	cin >> userNum;
+	while (userInput == 'y' || userInput == 'Y') {
+		//get user input
+		cout << "What puzzle number do you want to cross hatch: ";
+		cin >> userNum;
 
 
-	//calculations
-	cout << "Cross Hatch Before: " << endl;
-	displayArray(crossHatchArr);
-	cout << endl;
+		//calculations
+		cout << "Cross Hatch Before: " << endl;
+		displayArray(crossHatchArr);
+		cout << endl;
 
-	cout << "Puzzle Contents: " << endl;
-	displayArray(puzzleArr);
-	cout << endl;
+		cout << "Puzzle Contents: " << endl;
+		displayArray(puzzleArr);
+		cout << endl;
 
-	cout << "Cross Hatch After: " << endl;
-	searchForUserNum(userNum, puzzleArr, crossHatchArr);
-	cout << endl;
+		cout << "Cross Hatch After: " << endl;
+		searchForUserNum(userNum, puzzleArr, crossHatchArr);
+		cout << endl;
 
-	cout << endl;
+		cout << endl;
 
-  	if (searchForIsolates(crossHatchArr) == true) {
-		cout << "There is an isolate in the puzzle." << endl;
-		cout << "Would you like to populate the puzzle? (Y/N): " << endl;
+		if (searchForIsolates(crossHatchArr) == true) {
+			cout << "There is an isolate in the puzzle." << endl;
+			cout << "Would you like to populate the puzzle? (Y/N): ";
+			cin >> userInput;
+		}
+		else {
+			cout << "There are no isolates of this number." << endl;
+			userInput = 'n';
+		}
 
+		if (userInput == 'y' || userInput == 'Y') {			
+			cout << "Puzzle Contents Before: " << endl;
+			displayArray(puzzleArr);
+			cout << endl;
 
+			fillPuzzleArr(crossHatchArr, puzzleArr, userNum);
+
+			cout << "Puzzle Contents After: " << endl;
+			displayArray(puzzleArr);
+			cout << endl;
+		}
+
+		fillCrossHatchArrWithZeroes(crossHatchArr);
+		
+		cout << "Would you like to try again (Y/N): ";
+		cout << endl;
+		cin >> userInput;
 	}
-	else {
-		cout << "There are no isolates of this number." << endl;
-	}
-
-
-
 
 	return 0;
 }
@@ -171,9 +192,9 @@ bool searchForIsolates(int crossHatchArray[ROW][COL]) {
 	return isolateConfirmation;
 };
 
-void searchForCoordinatesOfIsolate(int crossHatchArray[ROW][COL], int startingRow, int startingCol, int lastRow, int lastCol) {
-	int rowOfZero;
-	int colOfZero;
+void searchForCoordinatesOfIsolate(int crossHatchArray[ROW][COL], int startingRow, int startingCol, int lastRow, int lastCol, int coordinates[COORDINATE_DIGITS]) {
+	int rowOfZero = 0;
+	int colOfZero = 0;
 	int numToSearchFor = 0;
 
 	for (int i = STARTINGPOINT; i < lastRow; i++) { //row count
@@ -184,6 +205,9 @@ void searchForCoordinatesOfIsolate(int crossHatchArray[ROW][COL], int startingRo
 			}
 		}
 	}
+
+	coordinates[0] = rowOfZero;
+	coordinates[1] = colOfZero;
 }
 
 bool searchUpperLeftCell(int crossHatchArray[ROW][COL]) {
@@ -208,7 +232,6 @@ bool searchUpperLeftCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
@@ -237,7 +260,6 @@ bool searchUpperMidCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
@@ -265,7 +287,6 @@ bool searchUpperRightCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
@@ -293,7 +314,6 @@ bool searchMidLeftCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
@@ -321,7 +341,6 @@ bool searchMidMidCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
@@ -349,7 +368,6 @@ bool searchMidRightCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
@@ -377,7 +395,6 @@ bool searchBottomLeftCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
@@ -405,7 +422,6 @@ bool searchBottomMidCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
@@ -433,8 +449,96 @@ bool searchBottomRightCell(int crossHatchArray[ROW][COL]) {
 
 	if (countOfZeroes == 1) {
 		isolateConfirmation = true;
-		searchForCoordinatesOfIsolate(crossHatchArray, startingRow, startingCol, lastRow, lastCol);
 	}
 
 	return isolateConfirmation;
+}
+
+void fillPuzzleArr(int crossHatchArr[ROW][COL], int puzzleArray[ROW][COL], int userNum) {
+	int coordinates[2];
+	int startingRow = 0;
+	int startingCol = 0;
+	int lastRow = 0;
+	int lastCol = 0;
+
+	if (searchUpperLeftCell(crossHatchArr) == true) {
+		int startingRow = 0;
+		int startingCol = 0;
+		int lastRow = 2;
+		int lastCol = 2;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
+
+	if (searchUpperMidCell(crossHatchArr) == true) {
+		int startingRow = 0;
+		int startingCol = 3;
+		int lastRow = 2;
+		int lastCol = 5;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
+
+	if (searchUpperRightCell(crossHatchArr) == true) {
+		int startingRow = 0;
+		int startingCol = 6;
+		int lastRow = 2;
+		int lastCol = 8;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
+
+	if (searchMidLeftCell(crossHatchArr) == true) {
+		int startingRow = 3;
+		int startingCol = 0;
+		int lastRow = 5;
+		int lastCol = 2;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
+
+	if (searchMidMidCell(crossHatchArr) == true) {
+		int startingRow = 3;
+		int startingCol = 3;
+		int lastRow = 5;
+		int lastCol = 5;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
+
+	if (searchMidRightCell(crossHatchArr) == true) {
+		int startingRow = 3;
+		int startingCol = 6;
+		int lastRow = 5;
+		int lastCol = 8;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
+
+	if (searchBottomLeftCell(crossHatchArr) == true) {
+		int startingRow = 6;
+		int startingCol = 0;
+		int lastRow = 8;
+		int lastCol = 2;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
+
+	if (searchBottomMidCell(crossHatchArr) == true) {
+		int startingRow = 6;
+		int startingCol = 3;
+		int lastRow = 8;
+		int lastCol = 5;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
+
+	if (searchBottomRightCell(crossHatchArr) == true) {
+		int startingRow = 6;
+		int startingCol = 6;
+		int lastRow = 8;
+		int lastCol = 8;
+		searchForCoordinatesOfIsolate(crossHatchArr, startingRow, startingCol, lastRow, lastCol, coordinates);
+		puzzleArray[coordinates[0]][coordinates[1]] = userNum;
+	}
 }
